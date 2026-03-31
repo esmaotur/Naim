@@ -75,4 +75,4 @@ npx expo start
 ---
 
 *Bu proje bir NAIM Challenge eseridir. 🏋️‍♂️🏆🗺️* 
-*Dr. Nurettin Şenyer ve Esma Otur katkılarıyla.*
+*Anılar biriktirmek için tasarlandı. ✨🌸*
