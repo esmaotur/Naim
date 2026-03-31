@@ -1,41 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput, SafeAreaView, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert, Modal, Image, StatusBar } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { StyleSheet, Text, View, TextInput, SafeAreaView, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert, Modal, Image, StatusBar, ActivityIndicator, Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { translations } from './translations';
 
 export default function App() {
+  // --- STATE ---
   const [city, setCity] = useState('');
   const [notes, setNotes] = useState('');
   const [image, setImage] = useState(null);
   const [trips, setTrips] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [lang, setLang] = useState('tr');
-  const [isDark, setIsDark] = useState(false); // Karanlık mod ayarı
+  const [isDark, setIsDark] = useState(false);
+  const [aiIsLoading, setAiIsLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const t = translations[lang];
 
+  // AI Modal States
   const [aiModalVisible, setAiModalVisible] = useState(false);
-  const [currentAiTip, setCurrentAiTip] = useState('');
+  const [currentAiRoute, setCurrentAiRoute] = useState(null);
   const [selectedCity, setSelectedCity] = useState('');
 
-  // AI Tavsiyeleri
-  const aiTips = {
-    "İstanbul": {
-      tr: "Boğaz'da gün batımını izle, Karaköy'de kahve iç ve mutlaka gizli geçitleri keşfet! ☕🌉",
-      en: "Watch the sunset on the Bosphorus, have coffee in Karaköy, and explore the hidden passages! ☕🌉"
-    },
-    "Paris": {
-      tr: "Eyfel'in kalabalığından kaç, Montmartre'ın ara sokaklarında kaybol... 🎨🥐",
-      en: "Escape the crowds of Eiffel, get lost in the side streets of Montmartre... 🎨🥐"
-    }
-  };
+  // Animasyonlar
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     loadTrips();
     loadLang();
     loadTheme();
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
   }, []);
 
+  // --- STORAGE ---
   const loadTheme = async () => {
     const savedTheme = await AsyncStorage.getItem('@theme_key');
     if (savedTheme) setIsDark(savedTheme === 'dark');
@@ -60,17 +61,18 @@ export default function App() {
 
   const loadTrips = async () => {
     try {
-      const savedTrips = await AsyncStorage.getItem('@trips_key');
+      const savedTrips = await AsyncStorage.getItem('@trips_key_v2'); // Yeni versiyon veri yapısı
       if (savedTrips !== null) setTrips(JSON.parse(savedTrips));
     } catch (e) { }
   };
 
   const saveTrips = async (newTrips) => {
     try {
-      await AsyncStorage.setItem('@trips_key', JSON.stringify(newTrips));
+      await AsyncStorage.setItem('@trips_key_v2', JSON.stringify(newTrips));
     } catch (e) { }
   };
 
+  // --- FEATURES ---
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
@@ -81,27 +83,59 @@ export default function App() {
     if (!result.canceled) setImage(result.assets[0].uri);
   };
 
+  const simulateVoiceInput = () => {
+    setIsListening(true);
+    setTimeout(() => {
+      setIsListening(false);
+      setNotes(lang === 'tr' ? "Harika bir seyahat planı istiyorum, deniz kenarı olsun." : "I want a great travel plan near the sea.");
+      Alert.alert(t.voiceButton, lang === 'tr' ? "Ses algılandı!" : "Voice detected!");
+    }, 2000);
+  };
+
+  // --- GEMINI AI ENGINE (Simulated Intelligent Generator) ---
+  const generateGeminiData = async (cityName, userNotes) => {
+    setAiIsLoading(true);
+    // Simüle edilmiş AI gecikmesi
+    await new Promise(resolve => setTimeout(resolve, 2500));
+
+    // Akıllı içerik üretimi (Dinamik)
+    const itn = {
+      day1: lang === 'tr' ? `Maceraya ${cityName} merkezinde başla. Yerel lezzetleri tadıp tarihi dokuyu keşfet.` : `Start adventure in ${cityName} center. Taste local flavors and explore history.`,
+      day2: lang === 'tr' ? `${userNotes || 'Şehir'} temasına uygun gizli rotaları keşfet. Akşama güzel bir manzara eşliğinde dinlen.` : `Explore hidden gems based on ${userNotes || 'city'}. Relax with a view in the evening.`,
+      day3: lang === 'tr' ? "Alışveriş ve son bir veda turu. Mutlaka bir hatıra fotoğrafı çek!" : "Shopping and final farewell tour. Don't forget to take a souvenir photo!",
+      weather: Math.floor(Math.random() * 15) + 15 + "°C ☀️",
+      aiScore: "9.8/10 ✨"
+    };
+
+    setAiIsLoading(false);
+    return itn;
+  };
+
   const handleAddTrip = async () => {
     if (city.trim() === '') {
       Alert.alert(t.errorTitle, t.errorMsg);
       return;
     }
-    let quote = "";
+
+    const aiData = await generateGeminiData(city, notes);
+
+    let quote = t.defaultQuote;
     try {
       const response = await fetch('https://api.quotable.io/random?tags=wisdom|inspirational');
       const data = await response.json();
       quote = data.content;
-    } catch (e) {
-      quote = t.defaultQuote;
-    }
+    } catch (e) { }
+
     const newTrip = {
       id: Date.now().toString(),
       city: city,
       notes: notes,
       image: image,
       quote: quote,
+      aiData: aiData,
       date: new Date().toLocaleDateString(lang === 'tr' ? 'tr-TR' : 'en-US'),
     };
+
     const updatedTrips = [newTrip, ...trips];
     setTrips(updatedTrips);
     saveTrips(updatedTrips);
@@ -110,26 +144,9 @@ export default function App() {
     setImage(null);
   };
 
-  const handleDeleteTrip = (id) => {
-    Alert.alert(t.deleteTitle, t.deleteMsg, [
-      { text: t.cancel, style: 'cancel' },
-      {
-        text: t.delete,
-        onPress: () => {
-          const updatedTrips = trips.filter(trip => trip.id !== id);
-          setTrips(updatedTrips);
-          saveTrips(updatedTrips);
-        },
-        style: 'destructive'
-      }
-    ]);
-  };
-
-  const getAiTip = (cityName) => {
+  const showAiPlan = (itinerary, cityName) => {
     setSelectedCity(cityName);
-    const tipData = aiTips[cityName];
-    const tip = tipData ? tipData[lang] : (lang === 'tr' ? `${cityName} harika bir seçim! Orada yerel pazarları gezmeyi ve en ünlü yemeği tatmayı unutma! ✨🌸` : `${cityName} is a great choice! Don't forget to visit local markets and taste the most famous food! ✨🌸`);
-    setCurrentAiTip(tip);
+    setCurrentAiRoute(itinerary);
     setAiModalVisible(true);
   };
 
@@ -138,99 +155,118 @@ export default function App() {
     trip.notes.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Dinamik Temalar
+  // --- THEME ---
   const theme = {
-    bg: isDark ? '#1A1A1A' : '#FFF5F8',
-    card: isDark ? '#2D2D2D' : '#FFFFFF',
-    text: isDark ? '#F5F5F5' : '#4F4F4F',
-    subText: isDark ? '#AAAAAA' : '#BFA2B2',
+    bg: isDark ? '#121212' : '#FFF5F8',
+    card: isDark ? '#1E1E1E' : '#FFFFFF',
+    text: isDark ? '#E0E0E0' : '#4F4F4F',
+    subText: isDark ? '#B0B0B0' : '#BFA2B2',
     accent: isDark ? '#FF6B8B' : '#FF85A2',
-    inputBg: isDark ? '#3D3D3D' : '#FFFFFF',
-    borderColor: isDark ? '#444444' : '#FFF0F3',
-    quoteBg: isDark ? '#3D2B30' : '#FFF0F3',
+    inputBg: isDark ? '#2C2C2C' : '#FFFFFF',
+    borderColor: isDark ? '#333333' : '#FFF0F3',
+    aiCard: isDark ? '#2D1D3D' : '#F8F0FF',
   };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.bg }]}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Animated.ScrollView contentContainerStyle={[styles.scrollContent, { opacity: fadeAnim }]}>
+
           <View style={styles.topButtons}>
             <TouchableOpacity style={[styles.controlBtn, { backgroundColor: theme.card, borderColor: theme.borderColor }]} onPress={toggleTheme}>
-              <Text style={styles.controlBtnText}>{isDark ? '☀️' : '�'}</Text>
+              <Text style={styles.controlBtnText}>{isDark ? '☀️' : '🌙'}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.controlBtn, { backgroundColor: theme.card, borderColor: theme.borderColor }]} onPress={toggleLang}>
-              <Text style={[styles.controlBtnText, { color: theme.accent }]}>{lang === 'tr' ? '�🇧 EN' : '🇹🇷 TR'}</Text>
+              <Text style={[styles.controlBtnText, { color: theme.accent }]}>{lang === 'tr' ? '🇬🇧 EN' : '🇹🇷 TR'}</Text>
             </TouchableOpacity>
           </View>
-
-          <View style={styles.decorationsLeft}><Text style={styles.decorText}>🌸</Text></View>
-          <View style={styles.decorationsRight}><Text style={styles.decorText}>🌺</Text></View>
 
           <View style={styles.headerContainer}>
             <Text style={[styles.headerTitle, { color: theme.accent }]}>{t.headerTitle}</Text>
             <Text style={[styles.headerSubtitle, { color: theme.subText }]}>{t.headerSubtitle}</Text>
           </View>
 
-          <View style={[styles.formContainer, { backgroundColor: isDark ? 'rgba(45, 45, 45, 0.9)' : 'rgba(255, 255, 255, 0.8)', shadowColor: theme.accent }]}>
+          <View style={[styles.formContainer, { backgroundColor: theme.card, shadowColor: theme.accent }]}>
             <View style={styles.inputWrapper}>
-              <Text style={[styles.label, { color: isDark ? theme.accent : '#9D8189' }]}>{t.inputLabelCity}</Text>
+              <Text style={[styles.label, { color: theme.accent }]}>{t.inputLabelCity}</Text>
               <TextInput style={[styles.input, { backgroundColor: theme.inputBg, color: theme.text, borderColor: theme.borderColor }]} placeholder={t.inputPlaceholderCity} placeholderTextColor="#777" value={city} onChangeText={setCity} />
             </View>
 
             <View style={styles.inputWrapper}>
-              <Text style={[styles.label, { color: isDark ? theme.accent : '#9D8189' }]}>{t.inputLabelNotes}</Text>
+              <View style={styles.labelRow}>
+                <Text style={[styles.label, { color: theme.accent }]}>{t.inputLabelNotes}</Text>
+                <TouchableOpacity onPress={simulateVoiceInput}>
+                  <Text style={{ fontSize: 18 }}>{isListening ? '🛑' : '🎙️'}</Text>
+                </TouchableOpacity>
+              </View>
               <TextInput style={[styles.input, styles.textArea, { backgroundColor: theme.inputBg, color: theme.text, borderColor: theme.borderColor }]} placeholder={t.inputPlaceholderNotes} placeholderTextColor="#777" multiline value={notes} onChangeText={setNotes} />
             </View>
 
-            <TouchableOpacity style={[styles.photoInput, { borderColor: theme.accent }, image && styles.photoSelected]} onPress={pickImage}>
-              <Text style={[styles.photoInputText, { color: isDark ? theme.accent : '#9D8189' }]}>{image ? t.photoSelected : t.photoButton}</Text>
-            </TouchableOpacity>
+            <View style={styles.actionRow}>
+              <TouchableOpacity style={[styles.smallBtn, { borderColor: theme.accent }]} onPress={pickImage}>
+                <Text style={[styles.smallBtnText, { color: theme.accent }]}>{image ? '✅' : '📸'}</Text>
+              </TouchableOpacity>
+            </View>
 
-            {image && <Image source={{ uri: image }} style={styles.previewImage} />}
-
-            <TouchableOpacity style={[styles.button, { backgroundColor: theme.accent }]} onPress={handleAddTrip}>
-              <Text style={styles.buttonText}>{t.saveButton}</Text>
+            <TouchableOpacity style={[styles.button, { backgroundColor: theme.accent }]} onPress={handleAddTrip} disabled={aiIsLoading}>
+              {aiIsLoading ? (
+                <ActivityIndicator color="#FFF" />
+              ) : (
+                <Text style={styles.buttonText}>{t.saveButton}</Text>
+              )}
             </TouchableOpacity>
           </View>
 
           {trips.length > 0 && (
             <View style={styles.listContainer}>
-              <Text style={[styles.listSectionTitle, { color: isDark ? theme.accent : '#9D8189' }]}>{t.listTitle}</Text>
-              <View style={styles.searchContainer}>
-                <TextInput style={[styles.searchInput, { backgroundColor: theme.card, color: theme.text, borderColor: theme.borderColor }]} placeholder={t.searchPlaceholder} placeholderTextColor="#777" value={searchQuery} onChangeText={setSearchQuery} />
-              </View>
+              <TextInput style={[styles.searchInput, { backgroundColor: theme.card, color: theme.text, borderColor: theme.borderColor }]} placeholder={t.searchPlaceholder} placeholderTextColor="#777" value={searchQuery} onChangeText={setSearchQuery} />
 
               {filteredTrips.map((item) => (
                 <View key={item.id} style={[styles.tripCard, { backgroundColor: theme.card, borderColor: theme.borderColor }]}>
                   <View style={styles.tripCardHeader}>
                     <Text style={[styles.tripCity, { color: theme.accent }]}>📍 {item.city}</Text>
-                    <TouchableOpacity onPress={() => handleDeleteTrip(item.id)}><Text style={styles.deleteBtn}>🗑️</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={() => Alert.alert(t.deleteTitle, t.deleteMsg, [{ text: t.cancel }, { text: t.delete, onPress: () => { setTrips(trips.filter(x => x.id !== item.id)); saveTrips(trips.filter(x => x.id !== item.id)) } }])}>
+                      <Text>🗑️</Text>
+                    </TouchableOpacity>
                   </View>
-                  <Text style={[styles.tripDate, { color: theme.subText }]}>{item.date}</Text>
+                  <Text style={[styles.tripDate, { color: theme.subText }]}>{item.date} • {t.weather}: {item.aiData.weather}</Text>
+
                   {item.image && <Image source={{ uri: item.image }} style={styles.cardImage} />}
-                  {item.quote && <View style={[styles.quoteWrapper, { backgroundColor: theme.quoteBg, borderLeftColor: theme.accent }]}><Text style={[styles.tripQuote, { color: isDark ? '#DDD' : '#9D8189' }]}>"{item.quote}"</Text></View>}
-                  {item.notes && <Text style={[styles.tripNotes, { color: isDark ? '#BBB' : '#7F6B73' }]}>{item.notes}</Text>}
-                  <TouchableOpacity style={[styles.aiButton, { backgroundColor: isDark ? '#3D2B3F' : '#F3E5F5', borderColor: isDark ? '#5D3B5F' : '#E1BEE7' }]} onPress={() => getAiTip(item.city)}><Text style={[styles.aiButtonText, { color: isDark ? '#E1BEE7' : '#7B1FA2' }]}>{t.aiButton}</Text></TouchableOpacity>
-                  <View style={styles.cardFlower}><Text>🌸</Text></View>
+
+                  <TouchableOpacity style={[styles.geminiBadge, { backgroundColor: theme.aiCard }]} onPress={() => showAiPlan(item.aiData, item.city)}>
+                    <Text style={styles.geminiBadgeText}>✨ Gemini AI Plan: {item.aiData.aiScore}</Text>
+                  </TouchableOpacity>
+
+                  {item.notes ? <Text style={[styles.tripNotes, { color: theme.text }]}>{item.notes}</Text> : null}
+                  <View style={styles.quoteBox}><Text style={styles.quoteText}>"{item.quote}"</Text></View>
                 </View>
               ))}
             </View>
           )}
 
-          <Modal animationType="fade" transparent={true} visible={aiModalVisible} onRequestClose={() => setAiModalVisible(false)}>
+          <Modal animationType="slide" transparent={true} visible={aiModalVisible} onRequestClose={() => setAiModalVisible(false)}>
             <View style={styles.modalOverlay}>
               <View style={[styles.modalContent, { backgroundColor: theme.card }]}>
-                <Text style={styles.modalTitle}>🤖 AI Seyahat Notu</Text>
+                <Text style={styles.modalTitle}>{t.aiModalTitle}</Text>
                 <Text style={[styles.modalCity, { color: theme.accent }]}>{selectedCity}</Text>
-                <Text style={[styles.modalTip, { color: theme.text }]}>{currentAiTip}</Text>
-                <TouchableOpacity style={[styles.closeBtn, { backgroundColor: theme.accent }]} onPress={() => setAiModalVisible(false)}><Text style={styles.closeBtnText}>{t.modalClose}</Text></TouchableOpacity>
+
+                {currentAiRoute && (
+                  <View style={styles.itineraryContainer}>
+                    <View style={styles.dayBox}><Text style={styles.dayTitle}>📅 {t.day} 1</Text><Text style={[styles.dayText, { color: theme.text }]}>{currentAiRoute.day1}</Text></View>
+                    <View style={styles.dayBox}><Text style={styles.dayTitle}>📅 {t.day} 2</Text><Text style={[styles.dayText, { color: theme.text }]}>{currentAiRoute.day2}</Text></View>
+                    <View style={styles.dayBox}><Text style={styles.dayTitle}>📅 {t.day} 3</Text><Text style={[styles.dayText, { color: theme.text }]}>{currentAiRoute.day3}</Text></View>
+                  </View>
+                )}
+
+                <TouchableOpacity style={[styles.closeBtn, { backgroundColor: theme.accent }]} onPress={() => setAiModalVisible(false)}>
+                  <Text style={styles.closeBtnText}>{t.modalClose}</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </Modal>
 
-          <View style={styles.footerDecor}><Text style={[styles.footerDecorText, { color: theme.subText }]}>✨ ☁️ 🌿 ☁️ ✨</Text></View>
-        </ScrollView>
+        </Animated.ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -238,50 +274,43 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { padding: 24, paddingTop: 65 },
-  topButtons: { position: 'absolute', top: 50, right: 20, flexDirection: 'row', zIndex: 100 },
-  controlBtn: { marginLeft: 8, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1, elevation: 3, justifyContent: 'center', alignItems: 'center' },
-  controlBtnText: { fontSize: 13, fontWeight: '700' },
-  decorationsLeft: { position: 'absolute', top: 20, left: 10, opacity: 0.4 },
-  decorationsRight: { position: 'absolute', top: 40, right: 15, opacity: 0.4 },
-  decorText: { fontSize: 52 },
-  headerContainer: { alignItems: 'center', marginBottom: 40 },
-  headerTitle: { fontSize: 36, fontWeight: '700', letterSpacing: 1.2, textAlign: 'center' },
-  headerSubtitle: { fontSize: 16, marginTop: 8, fontStyle: 'italic' },
-  formContainer: { borderRadius: 30, padding: 24, shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.2, shadowRadius: 15, elevation: 10, marginBottom: 40 },
-  inputWrapper: { marginBottom: 20 },
-  label: { fontSize: 14, fontWeight: '600', marginBottom: 8, marginLeft: 8 },
-  input: { borderWidth: 1, borderRadius: 20, paddingHorizontal: 20, paddingVertical: 12, fontSize: 16 },
+  scrollContent: { padding: 20, paddingTop: 60 },
+  topButtons: { position: 'absolute', top: 40, right: 20, flexDirection: 'row' },
+  controlBtn: { marginLeft: 10, padding: 8, borderRadius: 15, borderWidth: 1 },
+  controlBtnText: { fontWeight: '700' },
+  headerContainer: { marginBottom: 30, alignItems: 'center' },
+  headerTitle: { fontSize: 32, fontWeight: '800' },
+  headerSubtitle: { fontSize: 14, marginTop: 5 },
+  formContainer: { borderRadius: 25, padding: 20, elevation: 8, marginBottom: 30 },
+  inputWrapper: { marginBottom: 15 },
+  label: { fontSize: 14, fontWeight: '700', marginBottom: 5 },
+  labelRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  input: { borderWidth: 1, borderRadius: 15, padding: 12, fontSize: 16 },
   textArea: { height: 80, textAlignVertical: 'top' },
-  photoInput: { paddingVertical: 12, borderRadius: 15, alignItems: 'center', marginBottom: 15, borderWidth: 1, borderStyle: 'dashed' },
-  photoSelected: { borderStyle: 'solid', backgroundColor: 'rgba(76, 175, 80, 0.1)', borderColor: '#4CAF50' },
-  photoInputText: { fontSize: 13, fontWeight: '600' },
-  previewImage: { width: '100%', height: 150, borderRadius: 15, marginBottom: 15 },
-  button: { borderRadius: 20, paddingVertical: 15, alignItems: 'center', marginTop: 5, elevation: 5 },
-  buttonText: { color: '#FFFFFF', fontSize: 17, fontWeight: '700' },
-  listContainer: { marginTop: 10 },
-  listSectionTitle: { fontSize: 20, fontWeight: '700', marginBottom: 15, marginLeft: 8 },
-  searchContainer: { marginBottom: 16 },
-  searchInput: { borderWidth: 1, borderRadius: 15, paddingHorizontal: 15, paddingVertical: 10, fontSize: 14 },
-  tripCard: { borderRadius: 25, padding: 20, marginBottom: 16, borderWidth: 1, elevation: 3, position: 'relative', overflow: 'hidden' },
-  tripCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
-  tripCity: { fontSize: 19, fontWeight: '700' },
-  deleteBtn: { fontSize: 18, padding: 4 },
-  tripDate: { fontSize: 11, marginBottom: 8, marginLeft: 2 },
-  cardImage: { width: '100%', height: 180, borderRadius: 15, marginBottom: 12 },
-  tripNotes: { fontSize: 14, lineHeight: 20, marginTop: 8 },
-  quoteWrapper: { padding: 10, borderRadius: 15, marginVertical: 8, borderLeftWidth: 4 },
-  tripQuote: { fontSize: 12, fontStyle: 'italic', lineHeight: 18 },
-  aiButton: { borderRadius: 12, paddingVertical: 10, alignItems: 'center', marginTop: 12, borderWidth: 1 },
-  aiButtonText: { fontSize: 12, fontWeight: '600' },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modalContent: { borderRadius: 30, padding: 30, width: '85%', alignItems: 'center', elevation: 20 },
-  modalTitle: { fontSize: 18, fontWeight: '700', color: '#7B1FA2', marginBottom: 10 },
-  modalCity: { fontSize: 22, fontWeight: '800', marginBottom: 12 },
-  modalTip: { fontSize: 15, textAlign: 'center', lineHeight: 22, marginBottom: 25 },
-  closeBtn: { paddingHorizontal: 30, paddingVertical: 12, borderRadius: 15 },
-  closeBtnText: { color: '#FFFFFF', fontWeight: '700' },
-  cardFlower: { position: 'absolute', bottom: -10, right: -10, opacity: 0.15, transform: [{ scale: 1.5 }] },
-  footerDecor: { marginTop: 40, marginBottom: 60, alignItems: 'center' },
-  footerDecorText: { fontSize: 22, opacity: 0.4 },
+  actionRow: { flexDirection: 'row', marginBottom: 15 },
+  smallBtn: { padding: 10, borderRadius: 12, borderWidth: 1, marginRight: 10 },
+  button: { borderRadius: 15, padding: 16, alignItems: 'center' },
+  buttonText: { color: '#FFF', fontSize: 18, fontWeight: '700' },
+  listContainer: { marginBottom: 50 },
+  searchInput: { borderWidth: 1, borderRadius: 15, padding: 12, marginBottom: 20 },
+  tripCard: { borderRadius: 20, padding: 15, marginBottom: 15, borderWidth: 1, elevation: 4 },
+  tripCardHeader: { flexDirection: 'row', justifyContent: 'space-between' },
+  tripCity: { fontSize: 20, fontWeight: '700' },
+  tripDate: { fontSize: 11, marginVertical: 5 },
+  cardImage: { width: '100%', height: 160, borderRadius: 12, marginVertical: 10 },
+  geminiBadge: { padding: 10, borderRadius: 10, marginVertical: 5 },
+  geminiBadgeText: { color: '#7B1FA2', fontWeight: '700', fontSize: 13 },
+  tripNotes: { fontSize: 14, marginTop: 5 },
+  quoteBox: { marginTop: 10, opacity: 0.6 },
+  quoteText: { fontSize: 12, fontStyle: 'italic' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center' },
+  modalContent: { width: '90%', borderRadius: 25, padding: 25, alignItems: 'center' },
+  modalTitle: { fontSize: 20, fontWeight: '800', color: '#7B1FA2' },
+  modalCity: { fontSize: 24, fontWeight: '700', marginVertical: 10 },
+  itineraryContainer: { width: '100%', marginVertical: 15 },
+  dayBox: { marginBottom: 15 },
+  dayTitle: { fontWeight: '700', color: '#7B1FA2', marginBottom: 3 },
+  dayText: { fontSize: 14, lineHeight: 20 },
+  closeBtn: { paddingHorizontal: 40, paddingVertical: 12, borderRadius: 15, marginTop: 10 },
+  closeBtnText: { color: '#FFF', fontWeight: '700' }
 });

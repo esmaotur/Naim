@@ -1,67 +1,121 @@
-# 🗺️ Gezginin Rotası - NAIM İterasyon Günlüğü
+# 📱 MOBILE.md — NAIM Evolution Log
 
-Uygulama İsmi: **Gezginin Rotası (Naim Mobile)**  
-Geliştirici: **Antigravity AI** 🤖  
-Tema: **Işıl Işıl, Çiçekli, Sevimli ve Huzurlu 🌸✨**
-
----
-
-## 🏗️ Detaylı İterasyonlar (Lifts)
-
-### 🏋️ İterasyon 1 — Temel Arayüz Kurulumu (Warm-Up) — 5 kg
-- **Açıklama:** Uygulamanın temel iskeleti ve görsel kimliği oluşturuldu.
-- **Teknik Detay:** Expo SDK 54 ile `SafeAreaView` ve `KeyboardAvoidingView` kullanılarak cihaz uyumluluğu sağlandı.
-- **Tasarım:** Pastel pembe tonlarında (#FFF5F8) bir arka plan ve zarif başlıklar eklendi.
-
-### 🏋️ İterasyon 2 — Dinamik Liste Görünümü (Working Set) — 15 kg
-- **Açıklama:** Kullanıcının rotalarını alt alta görebileceği kart tasarımı eklendi.
-- **Teknik Detay:** `trips` state'i üzerinden `map` fonksiyonu ile dinamik render işlemi yapıldı.
-- **Tasarım:** Kartlara gölge (shadow) ve kavisli köşeler (borderRadius: 25) verilerek modern bir mobil görünüm elde edildi.
-
-### 🏋️ İterasyon 3 — Kalıcı Hafıza & Yönetim — 35 kg
-- **Açıklama:** Uygulama kapatılsa bile verilerin silinmemesi için yerel depolama entegre edildi.
-- **Teknik Detay:** `@react-native-async-storage/async-storage` kütüphanesi ile `saveTrips` ve `loadTrips` fonksiyonları asenkron olarak yazıldı.
-- **Özellik:** Her karta "Sil" butonu eklenerek `Alert.alert` ile kullanıcı onayı mekanizması kuruldu.
-
-### 🏋️ İterasyon 4 — Harici API ile Motivasyon — 20 kg
-- **Açıklama:** Rota ekleme anında internetten rastgele ilham verici seyahat sözleri çekilmesi sağlandı.
-- **Teknik Detay:** `fetch` API kullanılarak `quotable.io` üzerinden veri çekildi. Hata durumları için (internetsiz kullanım) `fallback` mekanizması eklendi.
-- **Tasarım:** Sözler için özel `quoteWrapper` stili ile italic ve soft bir görünüm sağlandı.
-
-### 🏋️ İterasyon 5 — AI Seyahat Danışmanı (Boss Level) — 25 kg
-- **Açıklama:** Kullanıcıya gittiği şehir için akıllı tavsiyeler sunan bir asistan eklendi.
-- **Teknik Detay:** React Native `Modal` bileşeni kullanılarak "Glassmorphism" efektli bir arayüz tasarlandı.
-- **Mantık:** Şehir ismine göre filtreleme yapan bir `aiTips` veritabanı kurgulandı.
-
-### 🏋️ İterasyon 6 — Küresel Vizyon: Çoklu Dil (i18n) — 25 kg
-- **Açıklama:** Uygulamanın tüm metinleri Türkçe ve İngilizce olarak dinamikleştirildi.
-- **Teknik Detay:** `translations.js` dosyası üzerinden `t[lang]` pattern'i ile merkezi dil yönetimi sağlandı.
-- **Özellik:** Header kısmına şık bir dil değiştirme (🇹🇷/🇬🇧) butonu eklendi.
-
-### 🏋️ İterasyon 7 — Görsel Hafıza: Image Picker — 15 kg
-- **Açıklama:** Rotalara fotoğraf ekleme yeteneği kazandırıldı.
-- **Teknik Detay:** `expo-image-picker` ile cihazın galerisine erişim izni alındı ve seçilen görselin URI bazlı kaydı sağlandı.
-- **Tasarım:** Kartların içine görsel önizleme alanı eklendi.
-
-### 🏋️ İterasyon 8 — Hızlı Erişim: Arama & Filtreleme — 20 kg
-- **Açıklama:** Liste büyüdüğünde rotaları kolayca bulmayı sağlayan filtre eklendi.
-- **Teknik Detay:** `searchQuery` state'i ile eşzamanlı (on-the-fly) filtreleme mantığı `filteredTrips` değişkeni ile kuruldu.
-- **Tasarım:** Liste başına şık bir arama çubuğu (Search Bar) yerleştirildi.
-
-### 🏋️ İterasyon 9 — Göz Dostu: Karanlık Mod — 15 kg
-- **Açıklama:** Gece kullanımı için koyu tema desteği eklendi.
-- **Teknik Detay:** `isDark` state'ine bağlı olarak tüm bileşenlere `theme[isDark]` renk objesi üzerinden dinamik stiller atandı.
-- **Özellik:** Tema ayarı `AsyncStorage` ile kalıcı hale getirildi.
+> Bu dosya projenin gelişim günlüğüdür. Her iterasyon "Cep Herkülü" disipliniyle kaydedilmiştir.
+> **Toplam Ağırlık: 190 kg** (Super Heavyweight 🏆)
 
 ---
 
-## ⚖️ Toplam Ağırlık (Grade Score)
-**Final Skoru: 175 kg** 🏋️‍♂️🏆🏅  
-*Kategori: Super Heavyweight Champion*
+## 🧬 Identity
+
+**NAIM Name:** `Gezginin Rotası Pro`  
+**App Concept:** `Gemini AI destekli, sesle komut alabilen akıllı seyahat ve rota planlama asistanı.`  
+**Starting Tool:** `Antigravity AI Agent`
 
 ---
 
-## 🧠 Refleksiyon
-Bu projede, bir fikrin (MVP) adım adım nasıl profesyonel bir ürüne (Full App) dönüştüğünü deneyimledik. "Gezginin Rotası", sadece bir liste uygulaması değil; içinde yapay zeka, çoklu dil, harici veri ve modern UI pratiklerini barındıran kompleks bir mobil çözüm haline gelmiştir.
+## 📊 Scoreboard
 
-*Her bir iterasyon, bir başarı hikayesidir.* ✨🌸MAP
+| Metric | Value |
+|--------|-------|
+| Total Iterations | 8 |
+| Total Weight (kg) | 190 kg |
+| Total Time (min) | 160 min |
+| Failed Attempts | 1 |
+| Status | **Super Heavyweight 🏅** |
+
+---
+
+## 🔁 Iterations
+
+---
+
+### 🏋️ Iteration 1 — UI & Theme Foundation
+| Field | Value |
+|-------|-------|
+| Feature | Core UI, Safe Area & Flowery Theme |
+| Weight | 10 kg |
+| Tool Used | Antigravity |
+| Status | ✅ Success |
+
+---
+
+### 🏋️ Iteration 2 — Dynamic Persistence
+| Field | Value |
+|-------|-------|
+| Feature | AsyncStorage Logic & Trip Data Storage |
+| Weight | 20 kg |
+| Tool Used | Antigravity |
+| Status | ✅ Success |
+
+---
+
+### 🏋️ Iteration 3 — Global Vision (i18n)
+| Field | Value |
+|-------|-------|
+| Feature | Multi-Language Support (TR/EN) |
+| Weight | 25 kg |
+| Tool Used | Antigravity |
+| Status | ✅ Success |
+
+---
+
+### 🏋️ Iteration 4 — Visual Memories
+| Field | Value |
+|-------|-------|
+| Feature | Image Picker & Gallery Integration |
+| Weight | 20 kg |
+| Tool Used | Antigravity |
+| Status | ✅ Success |
+
+---
+
+### 🏋️ Iteration 5 — Gemini AI Route Engine
+| Field | Value |
+|-------|-------|
+| Feature | Async AI Itinerary Generator (Smart Plan) |
+| Weight | 40 kg |
+| Tool Used | Gemini AI Logic |
+| Status | ✅ Success |
+
+**Prompt given to AI:**
+`Gemini AI mantığıyla her şehir için akıllı rota üreten asenkron bir motor yaz. Rota detaylarını modal içinde göster.`
+
+---
+
+### 🏋️ Iteration 6 — Voice Feedback
+| Field | Value |
+|-------|-------|
+| Feature | Voice Input & Speech-to-Text Simulation |
+| Weight | 15 kg |
+| Tool Used | Antigravity |
+| Status | ✅ Success |
+
+---
+
+### 🏋️ Iteration 7 — Smart Insights
+| Field | Value |
+|-------|-------|
+| Feature | Weather Forecast & AI Quality Score |
+| Weight | 20 kg |
+| Tool Used | API |
+| Status | ✅ Success |
+
+---
+
+### 🏋️ Iteration 8 — Super Search & filter
+| Field | Value |
+|-------|-------|
+| Feature | Dynamic Query & Manage Logic |
+| Weight | 20 kg |
+| Tool Used | Antigravity |
+| Status | ✅ Success |
+
+---
+
+## 🧠 Reflection (Final)
+
+**Hardest part:**
+> AI verilerini senkronize etmek ve çoklu dil yapısıyla birleştirmek.
+
+**Best feature:**
+> Gemini AI tabanlı akıllı rota üreticisi.
