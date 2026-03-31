@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput, SafeAreaView, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert, Modal } from 'react-native';
+import { StyleSheet, Text, View, TextInput, SafeAreaView, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert, Modal, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
 import { translations } from './translations';
 
 export default function App() {
   const [city, setCity] = useState('');
   const [notes, setNotes] = useState('');
+  const [image, setImage] = useState(null);
   const [trips, setTrips] = useState([]); // Rotaları tutan liste
   const [lang, setLang] = useState('tr'); // Dil ayarı
   const t = translations[lang]; // Mevcut dil çevirileri
@@ -22,12 +24,10 @@ export default function App() {
     },
     "Paris": {
       tr: "Eyfel'in kalabalığından kaç, Montmartre'ın ara sokaklarında kaybol... 🎨🥐",
-      en: "Escape the crowds of Eiffel, get lost in the side streets of Montmartre... �🥐"
-    },
-    // ... diğerleri için de eklenebilir
+      en: "Escape the crowds of Eiffel, get lost in the side streets of Montmartre... 🎨🥐"
+    }
   };
 
-  // Uygulama açıldığında verileri yükle
   useEffect(() => {
     loadTrips();
     loadLang();
@@ -66,6 +66,19 @@ export default function App() {
     }
   };
 
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
   const handleAddTrip = async () => {
     if (city.trim() === '') {
       Alert.alert(t.errorTitle, t.errorMsg);
@@ -85,6 +98,7 @@ export default function App() {
       id: Date.now().toString(),
       city: city,
       notes: notes,
+      image: image,
       quote: quote,
       date: new Date().toLocaleDateString(lang === 'tr' ? 'tr-TR' : 'en-US'),
     };
@@ -94,6 +108,7 @@ export default function App() {
     saveTrips(updatedTrips);
     setCity('');
     setNotes('');
+    setImage(null);
   };
 
   const handleDeleteTrip = (id) => {
@@ -130,12 +145,10 @@ export default function App() {
         style={{ flex: 1 }}
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* Dil Değiştirme Butonu */}
           <TouchableOpacity style={styles.langSwitch} onPress={toggleLang}>
             <Text style={styles.langText}>{lang === 'tr' ? '🇬🇧 EN' : '🇹🇷 TR'}</Text>
           </TouchableOpacity>
 
-          {/* Dekoratif Çiçekler ve Işıltılar */}
           <View style={styles.decorationsLeft}>
             <Text style={styles.decorText}>🌸</Text>
             <Text style={styles.decorTextSmall}>✨</Text>
@@ -145,13 +158,11 @@ export default function App() {
             <Text style={styles.decorText}>🌺</Text>
           </View>
 
-          {/* Ana Başlık */}
           <View style={styles.headerContainer}>
             <Text style={styles.headerTitle}>{t.headerTitle}</Text>
             <Text style={styles.headerSubtitle}>{t.headerSubtitle}</Text>
           </View>
 
-          {/* Giriş Alanları */}
           <View style={styles.formContainer}>
             <View style={styles.inputWrapper}>
               <Text style={styles.label}>{t.inputLabelCity}</Text>
@@ -177,12 +188,19 @@ export default function App() {
               />
             </View>
 
+            <TouchableOpacity style={[styles.photoInput, image && styles.photoSelected]} onPress={pickImage}>
+              <Text style={styles.photoInputText}>{image ? t.photoSelected : t.photoButton}</Text>
+            </TouchableOpacity>
+
+            {image && (
+              <Image source={{ uri: image }} style={styles.previewImage} />
+            )}
+
             <TouchableOpacity style={styles.button} onPress={handleAddTrip}>
               <Text style={styles.buttonText}>{t.saveButton}</Text>
             </TouchableOpacity>
           </View>
 
-          {/* Rotalarım Listesi */}
           {trips.length > 0 && (
             <View style={styles.listContainer}>
               <Text style={styles.listSectionTitle}>{t.listTitle}</Text>
@@ -195,6 +213,10 @@ export default function App() {
                     </TouchableOpacity>
                   </View>
                   <Text style={styles.tripDate}>{item.date}</Text>
+
+                  {item.image && (
+                    <Image source={{ uri: item.image }} style={styles.cardImage} />
+                  )}
 
                   {item.quote ? (
                     <View style={styles.quoteWrapper}>
@@ -218,7 +240,6 @@ export default function App() {
             </View>
           )}
 
-          {/* AI Modal */}
           <Modal
             animationType="slide"
             transparent={true}
@@ -240,7 +261,6 @@ export default function App() {
             </View>
           </Modal>
 
-          {/* Alt Dekorasyon */}
           <View style={styles.footerDecor}>
             <Text style={styles.footerDecorText}>✨ ☁️ 🌿 ☁️ ✨</Text>
           </View>
@@ -257,7 +277,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 24,
-    paddingTop: 60,
+    paddingTop: 65,
   },
   langSwitch: {
     position: 'absolute',
@@ -269,10 +289,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#FFF0F3',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
     elevation: 3,
     zIndex: 100,
   },
@@ -352,16 +368,38 @@ const styles = StyleSheet.create({
     height: 100,
     textAlignVertical: 'top',
   },
+  photoInput: {
+    backgroundColor: '#FFF0F3',
+    paddingVertical: 12,
+    borderRadius: 15,
+    alignItems: 'center',
+    marginBottom: 15,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: '#FFB3C6',
+  },
+  photoSelected: {
+    borderStyle: 'solid',
+    backgroundColor: '#E8F5E9',
+    borderColor: '#4CAF50',
+  },
+  photoInputText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#9D8189',
+  },
+  previewImage: {
+    width: '100%',
+    height: 150,
+    borderRadius: 15,
+    marginBottom: 15,
+  },
   button: {
     backgroundColor: '#FFB3C6',
     borderRadius: 20,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 10,
-    shadowColor: '#FF85A2',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 5,
     elevation: 5,
   },
   buttonText: {
@@ -386,10 +424,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
     borderColor: '#FFF0F3',
-    shadowColor: '#FFC1CC',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
     elevation: 3,
     position: 'relative',
     overflow: 'hidden',
@@ -414,6 +448,12 @@ const styles = StyleSheet.create({
     color: '#BFA2B2',
     marginBottom: 8,
     marginLeft: 2,
+  },
+  cardImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 15,
+    marginBottom: 12,
   },
   tripNotes: {
     fontSize: 14,
@@ -461,10 +501,6 @@ const styles = StyleSheet.create({
     padding: 30,
     width: '85%',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
     elevation: 20,
   },
   modalTitle: {
