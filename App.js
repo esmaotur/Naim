@@ -9,6 +9,7 @@ export default function App() {
   const [notes, setNotes] = useState('');
   const [image, setImage] = useState(null);
   const [trips, setTrips] = useState([]); // Rotaları tutan liste
+  const [searchQuery, setSearchQuery] = useState(''); // Arama sorgusu
   const [lang, setLang] = useState('tr'); // Dil ayarı
   const t = translations[lang]; // Mevcut dil çevirileri
 
@@ -16,7 +17,7 @@ export default function App() {
   const [currentAiTip, setCurrentAiTip] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
 
-  // AI Tavsiyeleri (Mock Database)
+  // AI Tavsiyeleri
   const aiTips = {
     "İstanbul": {
       tr: "Boğaz'da gün batımını izle, Karaköy'de kahve iç ve mutlaka gizli geçitleri keşfet! ☕🌉",
@@ -73,7 +74,6 @@ export default function App() {
       aspect: [4, 3],
       quality: 0.7,
     });
-
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
@@ -137,6 +137,12 @@ export default function App() {
     setCurrentAiTip(tip);
     setAiModalVisible(true);
   };
+
+  // Filtreleme Mantığı
+  const filteredTrips = trips.filter(trip =>
+    trip.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    trip.notes.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -203,8 +209,21 @@ export default function App() {
 
           {trips.length > 0 && (
             <View style={styles.listContainer}>
-              <Text style={styles.listSectionTitle}>{t.listTitle}</Text>
-              {trips.map((item) => (
+              <View style={styles.listHeaderRow}>
+                <Text style={styles.listSectionTitle}>{t.listTitle}</Text>
+              </View>
+
+              <View style={styles.searchContainer}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder={t.searchPlaceholder}
+                  placeholderTextColor="#BDBDBD"
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                />
+              </View>
+
+              {filteredTrips.map((item) => (
                 <View key={item.id} style={styles.tripCard}>
                   <View style={styles.tripCardHeader}>
                     <Text style={styles.tripCity}>📍 {item.city}</Text>
@@ -410,12 +429,35 @@ const styles = StyleSheet.create({
   listContainer: {
     marginTop: 10,
   },
+  listHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   listSectionTitle: {
     fontSize: 22,
     fontWeight: '700',
     color: '#9D8189',
-    marginBottom: 16,
     marginLeft: 8,
+  },
+  searchContainer: {
+    marginBottom: 16,
+  },
+  searchInput: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#FFF0F3',
+    borderRadius: 15,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: '#4F4F4F',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 2,
   },
   tripCard: {
     backgroundColor: '#FFFFFF',
