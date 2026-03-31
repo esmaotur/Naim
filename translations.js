@@ -1,0 +1,42 @@
+export const translations = {
+    tr: {
+        headerTitle: "Gezginin Rotası",
+        headerSubtitle: "Dünya Turu Başlıyor... ✨",
+        inputLabelCity: "Nereye Gidiyoruz? 🌿",
+        inputPlaceholderCity: "Şehir İsmi Yaz...",
+        inputLabelNotes: "Hayallerin & Notların 📝",
+        inputPlaceholderNotes: "Buraya notlarını bırakabilirsin...",
+        saveButton: "Rotayı Kaydet 🌸",
+        listTitle: "Kaydedilen Rotalarım ✨",
+        aiButton: "AI Tavsiyesi Al ✨🤖",
+        aiModalTitle: "🤖 AI Seyahat Notu",
+        modalClose: "Kapat 🌸",
+        errorTitle: "Hata",
+        errorMsg: "Lütfen bir şehir ismi girin 🌸",
+        deleteTitle: "Rotayı Sil 🕊️",
+        deleteMsg: "Bu rotayı silmek istediğinden emin misin?",
+        cancel: "Vazgeç",
+        delete: "Sil",
+        defaultQuote: "Yolculuk, her adımda yeni bir keşiftir. ✨"
+    },
+    en: {
+        headerTitle: "Traveler's Log",
+        headerSubtitle: "World Tour Begins... ✨",
+        inputLabelCity: "Where to? 🌿",
+        inputPlaceholderCity: "Type City Name...",
+        inputLabelNotes: "Dreams & Notes 📝",
+        inputPlaceholderNotes: "Leave your notes here...",
+        saveButton: "Save Route 🌸",
+        listTitle: "My Saved Routes ✨",
+        aiButton: "Get AI Advice ✨🤖",
+        aiModalTitle: "🤖 AI Travel Tip",
+        modalClose: "Close 🌸",
+        errorTitle: "Error",
+        errorMsg: "Please enter a city name 🌸",
+        deleteTitle: "Delete Route 🕊️",
+        deleteMsg: "Are you sure you want to delete this route?",
+        cancel: "Cancel",
+        delete: "Delete",
+        defaultQuote: "Travel is a new discovery at every step. ✨"
+    }
+};

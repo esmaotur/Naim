@@ -1,35 +1,50 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, SafeAreaView, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert, Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { translations } from './translations';
 
 export default function App() {
   const [city, setCity] = useState('');
   const [notes, setNotes] = useState('');
   const [trips, setTrips] = useState([]); // Rotaları tutan liste
+  const [lang, setLang] = useState('tr'); // Dil ayarı
+  const t = translations[lang]; // Mevcut dil çevirileri
+
   const [aiModalVisible, setAiModalVisible] = useState(false);
   const [currentAiTip, setCurrentAiTip] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
 
   // AI Tavsiyeleri (Mock Database)
   const aiTips = {
-    "İstanbul": "Boğaz'da gün batımını izle, Karaköy'de kahve iç ve mutlaka gizli geçitleri keşfet! ☕🌉",
-    "Paris": "Eyfel'in kalabalığından kaç, Montmartre'ın ara sokaklarında kaybol... 🎨🥐",
-    "Roma": "Trastevere bölgesinde akşam yemeği ye, Trevi çeşmesine gece git! 🍕⛲",
-    "Londra": "South Bank'te yürü, Camden Market'ta vintage ürünler bul! 🎡🎸",
-    "Tokyo": "Shibuya'da kalabalığa karış, Shinjuku'da neon ışıkları izle! 🍣🏮"
-  };
-
-  const getAiTip = (cityName) => {
-    setSelectedCity(cityName);
-    const tip = aiTips[cityName] || `${cityName} harika bir seçim! Orada yerel pazarları gezmeyi ve en ünlü yemeği tatmayı unutma! ✨🌸`;
-    setCurrentAiTip(tip);
-    setAiModalVisible(true);
+    "İstanbul": {
+      tr: "Boğaz'da gün batımını izle, Karaköy'de kahve iç ve mutlaka gizli geçitleri keşfet! ☕🌉",
+      en: "Watch the sunset on the Bosphorus, have coffee in Karaköy, and explore the hidden passages! ☕🌉"
+    },
+    "Paris": {
+      tr: "Eyfel'in kalabalığından kaç, Montmartre'ın ara sokaklarında kaybol... 🎨🥐",
+      en: "Escape the crowds of Eiffel, get lost in the side streets of Montmartre... �🥐"
+    },
+    // ... diğerleri için de eklenebilir
   };
 
   // Uygulama açıldığında verileri yükle
   useEffect(() => {
     loadTrips();
+    loadLang();
   }, []);
+
+  const loadLang = async () => {
+    try {
+      const savedLang = await AsyncStorage.getItem('@lang_key');
+      if (savedLang) setLang(savedLang);
+    } catch (e) { }
+  };
+
+  const toggleLang = async () => {
+    const newLang = lang === 'tr' ? 'en' : 'tr';
+    setLang(newLang);
+    await AsyncStorage.setItem('@lang_key', newLang);
+  };
 
   const loadTrips = async () => {
     try {
@@ -53,7 +68,7 @@ export default function App() {
 
   const handleAddTrip = async () => {
     if (city.trim() === '') {
-      Alert.alert('Hata', 'Lütfen bir şehir ismi girin 🌸');
+      Alert.alert(t.errorTitle, t.errorMsg);
       return;
     }
 
@@ -63,7 +78,7 @@ export default function App() {
       const data = await response.json();
       quote = data.content;
     } catch (e) {
-      quote = "Yolculuk, her adımda yeni bir keşiftir. ✨";
+      quote = t.defaultQuote;
     }
 
     const newTrip = {
@@ -71,7 +86,7 @@ export default function App() {
       city: city,
       notes: notes,
       quote: quote,
-      date: new Date().toLocaleDateString('tr-TR'),
+      date: new Date().toLocaleDateString(lang === 'tr' ? 'tr-TR' : 'en-US'),
     };
 
     const updatedTrips = [newTrip, ...trips];
@@ -83,12 +98,12 @@ export default function App() {
 
   const handleDeleteTrip = (id) => {
     Alert.alert(
-      'Rotayı Sil 🕊️',
-      'Bu rotayı silmek istediğinden emin misin?',
+      t.deleteTitle,
+      t.deleteMsg,
       [
-        { text: 'Vazgeç', style: 'cancel' },
+        { text: t.cancel, style: 'cancel' },
         {
-          text: 'Sil',
+          text: t.delete,
           onPress: () => {
             const updatedTrips = trips.filter(trip => trip.id !== id);
             setTrips(updatedTrips);
@@ -100,6 +115,14 @@ export default function App() {
     );
   };
 
+  const getAiTip = (cityName) => {
+    setSelectedCity(cityName);
+    const tipData = aiTips[cityName];
+    const tip = tipData ? tipData[lang] : (lang === 'tr' ? `${cityName} harika bir seçim! Orada yerel pazarları gezmeyi ve en ünlü yemeği tatmayı unutma! ✨🌸` : `${cityName} is a great choice! Don't forget to visit local markets and taste the most famous food! ✨🌸`);
+    setCurrentAiTip(tip);
+    setAiModalVisible(true);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -107,6 +130,11 @@ export default function App() {
         style={{ flex: 1 }}
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
+          {/* Dil Değiştirme Butonu */}
+          <TouchableOpacity style={styles.langSwitch} onPress={toggleLang}>
+            <Text style={styles.langText}>{lang === 'tr' ? '🇬🇧 EN' : '🇹🇷 TR'}</Text>
+          </TouchableOpacity>
+
           {/* Dekoratif Çiçekler ve Işıltılar */}
           <View style={styles.decorationsLeft}>
             <Text style={styles.decorText}>🌸</Text>
@@ -119,17 +147,17 @@ export default function App() {
 
           {/* Ana Başlık */}
           <View style={styles.headerContainer}>
-            <Text style={styles.headerTitle}>Gezginin Rotası</Text>
-            <Text style={styles.headerSubtitle}>Dünya Turu Başlıyor... ✨</Text>
+            <Text style={styles.headerTitle}>{t.headerTitle}</Text>
+            <Text style={styles.headerSubtitle}>{t.headerSubtitle}</Text>
           </View>
 
           {/* Giriş Alanları */}
           <View style={styles.formContainer}>
             <View style={styles.inputWrapper}>
-              <Text style={styles.label}>Nereye Gidiyoruz? 🌿</Text>
+              <Text style={styles.label}>{t.inputLabelCity}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Şehir İsmi Yaz..."
+                placeholder={t.inputPlaceholderCity}
                 placeholderTextColor="#BDBDBD"
                 value={city}
                 onChangeText={setCity}
@@ -137,10 +165,10 @@ export default function App() {
             </View>
 
             <View style={styles.inputWrapper}>
-              <Text style={styles.label}>Hayallerin & Notların 📝</Text>
+              <Text style={styles.label}>{t.inputLabelNotes}</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
-                placeholder="Buraya notlarını bırakabilirsin..."
+                placeholder={t.inputPlaceholderNotes}
                 placeholderTextColor="#BDBDBD"
                 multiline
                 numberOfLines={4}
@@ -150,14 +178,14 @@ export default function App() {
             </View>
 
             <TouchableOpacity style={styles.button} onPress={handleAddTrip}>
-              <Text style={styles.buttonText}>Rotayı Kaydet 🌸</Text>
+              <Text style={styles.buttonText}>{t.saveButton}</Text>
             </TouchableOpacity>
           </View>
 
           {/* Rotalarım Listesi */}
           {trips.length > 0 && (
             <View style={styles.listContainer}>
-              <Text style={styles.listSectionTitle}>Kaydedilen Rotalarım ✨</Text>
+              <Text style={styles.listSectionTitle}>{t.listTitle}</Text>
               {trips.map((item) => (
                 <View key={item.id} style={styles.tripCard}>
                   <View style={styles.tripCardHeader}>
@@ -179,7 +207,7 @@ export default function App() {
                   ) : null}
 
                   <TouchableOpacity style={styles.aiButton} onPress={() => getAiTip(item.city)}>
-                    <Text style={styles.aiButtonText}>AI Tavsiyesi Al ✨🤖</Text>
+                    <Text style={styles.aiButtonText}>{t.aiButton}</Text>
                   </TouchableOpacity>
 
                   <View style={styles.cardFlower}>
@@ -199,14 +227,14 @@ export default function App() {
           >
             <View style={styles.modalOverlay}>
               <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>🤖 AI Seyahat Notu</Text>
+                <Text style={styles.modalTitle}>{t.aiModalTitle}</Text>
                 <Text style={styles.modalCity}>{selectedCity}</Text>
                 <Text style={styles.modalTip}>{currentAiTip}</Text>
                 <TouchableOpacity
                   style={styles.closeBtn}
                   onPress={() => setAiModalVisible(false)}
                 >
-                  <Text style={styles.closeBtnText}>Kapat 🌸</Text>
+                  <Text style={styles.closeBtnText}>{t.modalClose}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -230,6 +258,28 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 24,
     paddingTop: 60,
+  },
+  langSwitch: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#FFF0F3',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    zIndex: 100,
+  },
+  langText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FF85A2',
   },
   decorationsLeft: {
     position: 'absolute',
