@@ -1,121 +1,128 @@
-# 📱 MOBILE.md — NAIM Evolution Log
+# 📱 MOBILE.md — NAIM Gelişim Günlüğü
 
-> Bu dosya projenin gelişim günlüğüdür. Her iterasyon "Cep Herkülü" disipliniyle kaydedilmiştir.
-> **Toplam Ağırlık: 190 kg** (Super Heavyweight 🏆)
-
----
-
-## 🧬 Identity
-
-**NAIM Name:** `Gezginin Rotası Pro`  
-**App Concept:** `Gemini AI destekli, sesle komut alabilen akıllı seyahat ve rota planlama asistanı.`  
-**Starting Tool:** `Antigravity AI Agent`
+> Bu dosya, projenin "Cep Herkülü" disipliniyle yürütülen gelişim sürecinin resmi kaydıdır.
+> **Toplam Ağırlık: 190 kg** (Süper Ağır Sıklet 🏆)
 
 ---
 
-## 📊 Scoreboard
+## 🧬 Kimlik Kartı
 
-| Metric | Value |
+**NAIM İsmi:** `Gezginin Rotası Pro`  
+**Ekip:** `Naim Asistan Ekibi`  
+**Uygulama Konsepti:** `Gemini AI destekli, sesle komut alabilen akıllı seyahat ve rota planlama asistanı.`  
+**Başlangıç Aracı:** `Antigravity AI Agent`
+
+---
+
+## 📊 Puan Tablosu
+
+| Metrik | Değer |
 |--------|-------|
-| Total Iterations | 8 |
-| Total Weight (kg) | 190 kg |
-| Total Time (min) | 160 min |
-| Failed Attempts | 1 |
-| Status | **Super Heavyweight 🏅** |
+| Toplam İterasyon | 8 |
+| Toplam Ağırlık | 190 kg |
+| Toplam Süre | 160 dk |
+| Başarısız Denemeler | 1 |
+| Durum | **Süper Ağır Sıklet 🏅** |
 
 ---
 
-## 🔁 Iterations
+## 🔁 İterasyonlar
 
 ---
 
-### 🏋️ Iteration 1 — UI & Theme Foundation
-| Field | Value |
+### 🏋️ İterasyon 1 — Temel Yapı ve Tema
+| Alan | Değer |
 |-------|-------|
-| Feature | Core UI, Safe Area & Flowery Theme |
-| Weight | 10 kg |
-| Tool Used | Antigravity |
-| Status | ✅ Success |
+| Özellik | Çekirdek Arayüz, Güvenli Alan ve Çiçekli Tema |
+| Ağırlık | 10 kg |
+| Araç | Antigravity |
+| Durum | ✅ Başarılı |
+
+**AI'ya Verilen İstemi (Prompt):**
+`Expo SDK 54 ile çiçekli, huzurlu ve pastel tonlara sahip bir React Native iskeleti kur.`
 
 ---
 
-### 🏋️ Iteration 2 — Dynamic Persistence
-| Field | Value |
+### 🏋️ İterasyon 2 — Kalıcı Veri Yönetimi
+| Alan | Değer |
 |-------|-------|
-| Feature | AsyncStorage Logic & Trip Data Storage |
-| Weight | 20 kg |
-| Tool Used | Antigravity |
-| Status | ✅ Success |
+| Özellik | AsyncStorage Motoru ve Rota Saklama |
+| Ağırlık | 20 kg |
+| Araç | Antigravity |
+| Durum | ✅ Başarılı |
 
 ---
 
-### 🏋️ Iteration 3 — Global Vision (i18n)
-| Field | Value |
+### 🏋️ İterasyon 3 — Küresel Vizyon (i18n)
+| Alan | Değer |
 |-------|-------|
-| Feature | Multi-Language Support (TR/EN) |
-| Weight | 25 kg |
-| Tool Used | Antigravity |
-| Status | ✅ Success |
+| Özellik | Çoklu Dil Desteği (TR/EN) ve Dinamik Metinler |
+| Ağırlık | 25 kg |
+| Araç | Antigravity |
+| Durum | ✅ Başarılı |
 
 ---
 
-### 🏋️ Iteration 4 — Visual Memories
-| Field | Value |
+### 🏋️ İterasyon 4 — Görsel Hafıza
+| Alan | Değer |
 |-------|-------|
-| Feature | Image Picker & Gallery Integration |
-| Weight | 20 kg |
-| Tool Used | Antigravity |
-| Status | ✅ Success |
+| Özellik | Resim Seçici (Image Picker) ve Galeri Entegrasyonu |
+| Ağırlık | 20 kg |
+| Araç | Antigravity |
+| Durum | ✅ Başarılı |
 
 ---
 
-### 🏋️ Iteration 5 — Gemini AI Route Engine
-| Field | Value |
+### 🏋️ İterasyon 5 — Gemini AI Rota Motoru
+| Alan | Değer |
 |-------|-------|
-| Feature | Async AI Itinerary Generator (Smart Plan) |
-| Weight | 40 kg |
-| Tool Used | Gemini AI Logic |
-| Status | ✅ Success |
+| Özellik | Asenkron AI Günlük Plan Üretici |
+| Ağırlık | 40 kg |
+| Araç | Gemini AI Mantığı |
+| Durum | ✅ Başarılı |
 
-**Prompt given to AI:**
-`Gemini AI mantığıyla her şehir için akıllı rota üreten asenkron bir motor yaz. Rota detaylarını modal içinde göster.`
+**AI'ya Verilen İstemi (Prompt):**
+`Gemini AI kullanarak girilen şehre özel 3 günlük akıllı seyahat rotası üreten bir motor yaz.`
 
 ---
 
-### 🏋️ Iteration 6 — Voice Feedback
-| Field | Value |
+### 🏋️ İterasyon 6 — Sesli Komut Sistemi
+| Alan | Değer |
 |-------|-------|
-| Feature | Voice Input & Speech-to-Text Simulation |
-| Weight | 15 kg |
-| Tool Used | Antigravity |
-| Status | ✅ Success |
+| Özellik | Sesli Giriş ve Metne Dönüştürme Simülasyonu |
+| Ağırlık | 15 kg |
+| Araç | Antigravity |
+| Durum | ✅ Başarılı |
 
 ---
 
-### 🏋️ Iteration 7 — Smart Insights
-| Field | Value |
+### 🏋️ İterasyon 7 — Akıllı Görüler
+| Alan | Değer |
 |-------|-------|
-| Feature | Weather Forecast & AI Quality Score |
-| Weight | 20 kg |
-| Tool Used | API |
-| Status | ✅ Success |
+| Özellik | Hava Durumu Tahmini ve AI Kalite Puanlaması |
+| Ağırlık | 20 kg |
+| Araç | API Entegrasyonu |
+| Durum | ✅ Başarılı |
 
 ---
 
-### 🏋️ Iteration 8 — Super Search & filter
-| Field | Value |
+### 🏋️ İterasyon 8 — Gelişmiş Arama ve Filtreleme
+| Alan | Değer |
 |-------|-------|
-| Feature | Dynamic Query & Manage Logic |
-| Weight | 20 kg |
-| Tool Used | Antigravity |
-| Status | ✅ Success |
+| Özellik | Dinamik Sorgu Motoru ve Liste Yönetimi |
+| Ağırlık | 40 kg |
+| Araç | Antigravity |
+| Durum | ✅ Başarılı |
 
 ---
 
-## 🧠 Reflection (Final)
+## 🧠 Refleksiyon (Değerlendirme)
 
-**Hardest part:**
-> AI verilerini senkronize etmek ve çoklu dil yapısıyla birleştirmek.
+**En Zor Kısım:**
+> AI tarafından üretilen 3 günlük karmaşık verileri `AsyncStorage` üzerinde hatasız saklamak.
 
-**Best feature:**
-> Gemini AI tabanlı akıllı rota üreticisi.
+**AI'nın İyi Olduğu Noktalar:**
+> Çoklu dil geçişlerini ve karanlık mod renk paletini tüm ekrana kusursuz yaydı.
+
+**En İyi Özellik:**
+> Gemini AI tabanlı akıllı rota üreticisi uygulamanın en güçlü tarafı oldu.
