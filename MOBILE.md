@@ -29,12 +29,23 @@
 - **Kullanılan Araçlar:** React Native State management, ScrollView mapping.
 - **Notlar:** Kullanıcı artık girdiği rotaları anlık olarak görebiliyor. Toplam ağırlık 20kg'a ulaştı!
 
+### İterasyon 3 — Hafıza ve Yönetim (Heavy Lift)
+- **Tarih:** 31 Mart 2026
+- **Kaldırılan Ağırlık:** 35 kg 🏋️‍♂️ (AsyncStorage: 20kg + Delete: 15kg)
+- **Eklenen Özellikler:** 
+    - `AsyncStorage` entegrasyonu ile verilerin telefon hafızasında kalıcı olarak saklanması.
+    - Uygulama her açıldığında eski rotaların otomatik yüklenmesi.
+    - Her rota kartına "Sil" (🗑️) butonu ve silme onayı (Alert) eklendi.
+    - Başarısız girişler için hata uyarıları.
+- **Kullanılan Araçlar:** `@react-native-async-storage/async-storage`, `useEffect`, `Alert` API.
+- **Notlar:** Uygulama artık "gerçek" bir uygulama gibi davranıyor; veriler kaybolmuyor. 55kg kaldırıldı!
+
 ---
 
 ## ⚖️ Toplam Ağırlık (Grade Score)
-**Toplam Kaldırılan:** 20 kg
+**Toplam Kaldırılan:** 55 kg
 
 ---
 
 ## 🧠 Refleksiyon
-İkinci adımda uygulamanın fonksiyonelliğini ciddi oranda artırdık. Liste görünümü sayesinde kullanıcı geçmiş verileri görebiliyor. Tasarımda tutarlılığı koruyarak çiçekli ve ışıl ışıl yapıyı her kartın içine taşıdık. Bir sonraki adımda görsel veya silme özelliği ekleyerek "Ağır Sıklet" (Heavyweight) kategorisine adım atabiliriz.
+Üçüncü adımda uygulamanın "veri güvenliğini" sağladık. AsyncStorage kurulumu ve yönetimi sayesinde proje çok daha profesyonel bir seviyeye geldi. Silme özelliği ise yönetilebilirliği artırdı. Bir sonraki hedefimiz Hava Durumu veya AI desteği ekleyerek 75-100 kg barajını zorlamak.

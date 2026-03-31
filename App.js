@@ -1,13 +1,42 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, SafeAreaView, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, TextInput, SafeAreaView, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function App() {
   const [city, setCity] = useState('');
   const [notes, setNotes] = useState('');
   const [trips, setTrips] = useState([]); // Rotaları tutan liste
 
+  // Uygulama açıldığında verileri yükle
+  useEffect(() => {
+    loadTrips();
+  }, []);
+
+  const loadTrips = async () => {
+    try {
+      const savedTrips = await AsyncStorage.getItem('@trips_key');
+      if (savedTrips !== null) {
+        setTrips(JSON.parse(savedTrips));
+      }
+    } catch (e) {
+      console.error("Veriler yüklenirken hata oluştu:", e);
+    }
+  };
+
+  const saveTrips = async (newTrips) => {
+    try {
+      const jsonValue = JSON.stringify(newTrips);
+      await AsyncStorage.setItem('@trips_key', jsonValue);
+    } catch (e) {
+      console.error("Veriler kaydedilirken hata oluştu:", e);
+    }
+  };
+
   const handleAddTrip = () => {
-    if (city.trim() === '') return;
+    if (city.trim() === '') {
+      Alert.alert('Hata', 'Lütfen bir şehir ismi girin 🌸');
+      return;
+    }
 
     const newTrip = {
       id: Date.now().toString(),
@@ -16,9 +45,30 @@ export default function App() {
       date: new Date().toLocaleDateString('tr-TR'),
     };
 
-    setTrips([newTrip, ...trips]);
+    const updatedTrips = [newTrip, ...trips];
+    setTrips(updatedTrips);
+    saveTrips(updatedTrips);
     setCity('');
     setNotes('');
+  };
+
+  const handleDeleteTrip = (id) => {
+    Alert.alert(
+      'Rotayı Sil 🕊️',
+      'Bu rotayı silmek istediğinden emin misin?',
+      [
+        { text: 'Vazgeç', style: 'cancel' },
+        {
+          text: 'Sil',
+          onPress: () => {
+            const updatedTrips = trips.filter(trip => trip.id !== id);
+            setTrips(updatedTrips);
+            saveTrips(updatedTrips);
+          },
+          style: 'destructive'
+        }
+      ]
+    );
   };
 
   return (
@@ -83,8 +133,11 @@ export default function App() {
                 <View key={item.id} style={styles.tripCard}>
                   <View style={styles.tripCardHeader}>
                     <Text style={styles.tripCity}>📍 {item.city}</Text>
-                    <Text style={styles.tripDate}>{item.date}</Text>
+                    <TouchableOpacity onPress={() => handleDeleteTrip(item.id)}>
+                      <Text style={styles.deleteBtn}>🗑️</Text>
+                    </TouchableOpacity>
                   </View>
+                  <Text style={styles.tripDate}>{item.date}</Text>
                   {item.notes ? (
                     <Text style={styles.tripNotes}>{item.notes}</Text>
                   ) : null}
@@ -232,16 +285,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   tripCity: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
     color: '#FF85A2',
+  },
+  deleteBtn: {
+    fontSize: 18,
+    padding: 4,
   },
   tripDate: {
     fontSize: 12,
     color: '#BFA2B2',
+    marginBottom: 8,
+    marginLeft: 2,
   },
   tripNotes: {
     fontSize: 14,
