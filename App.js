@@ -1,65 +1,107 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TextInput, SafeAreaView, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 
 export default function App() {
   const [city, setCity] = useState('');
   const [notes, setNotes] = useState('');
+  const [trips, setTrips] = useState([]); // Rotaları tutan liste
+
+  const handleAddTrip = () => {
+    if (city.trim() === '') return;
+
+    const newTrip = {
+      id: Date.now().toString(),
+      city: city,
+      notes: notes,
+      date: new Date().toLocaleDateString('tr-TR'),
+    };
+
+    setTrips([newTrip, ...trips]);
+    setCity('');
+    setNotes('');
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Dekoratif Çiçekler ve Işıltılar */}
-        <View style={styles.decorationsLeft}>
-          <Text style={styles.decorText}>🌸</Text>
-          <Text style={styles.decorTextSmall}>✨</Text>
-        </View>
-        <View style={styles.decorationsRight}>
-          <Text style={styles.decorTextSmall}>✨</Text>
-          <Text style={styles.decorText}>🌺</Text>
-        </View>
-
-        {/* Ana Başlık */}
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerTitle}>Gezginin Rotası</Text>
-          <Text style={styles.headerSubtitle}>Dünya Turu Başlıyor... ✨</Text>
-        </View>
-
-        {/* Giriş Alanları */}
-        <View style={styles.formContainer}>
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>Nereye Gidiyoruz? 🌿</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Şehir İsmi Yaz..."
-              placeholderTextColor="#BDBDBD"
-              value={city}
-              onChangeText={setCity}
-            />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {/* Dekoratif Çiçekler ve Işıltılar */}
+          <View style={styles.decorationsLeft}>
+            <Text style={styles.decorText}>🌸</Text>
+            <Text style={styles.decorTextSmall}>✨</Text>
+          </View>
+          <View style={styles.decorationsRight}>
+            <Text style={styles.decorTextSmall}>✨</Text>
+            <Text style={styles.decorText}>🌺</Text>
           </View>
 
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>Hayallerin & Notların 📝</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              placeholder="Buraya notlarını bırakabilirsin..."
-              placeholderTextColor="#BDBDBD"
-              multiline
-              numberOfLines={4}
-              value={notes}
-              onChangeText={setNotes}
-            />
+          {/* Ana Başlık */}
+          <View style={styles.headerContainer}>
+            <Text style={styles.headerTitle}>Gezginin Rotası</Text>
+            <Text style={styles.headerSubtitle}>Dünya Turu Başlıyor... ✨</Text>
           </View>
 
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Rotayı Kaydet 🌸</Text>
-          </TouchableOpacity>
-        </View>
+          {/* Giriş Alanları */}
+          <View style={styles.formContainer}>
+            <View style={styles.inputWrapper}>
+              <Text style={styles.label}>Nereye Gidiyoruz? 🌿</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Şehir İsmi Yaz..."
+                placeholderTextColor="#BDBDBD"
+                value={city}
+                onChangeText={setCity}
+              />
+            </View>
 
-        {/* Alt Dekorasyon */}
-        <View style={styles.footerDecor}>
-          <Text style={styles.footerDecorText}>✨ ☁️ 🌿 ☁️ ✨</Text>
-        </View>
-      </ScrollView>
+            <View style={styles.inputWrapper}>
+              <Text style={styles.label}>Hayallerin & Notların 📝</Text>
+              <TextInput
+                style={[styles.input, styles.textArea]}
+                placeholder="Buraya notlarını bırakabilirsin..."
+                placeholderTextColor="#BDBDBD"
+                multiline
+                numberOfLines={4}
+                value={notes}
+                onChangeText={setNotes}
+              />
+            </View>
+
+            <TouchableOpacity style={styles.button} onPress={handleAddTrip}>
+              <Text style={styles.buttonText}>Rotayı Kaydet 🌸</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Rotalarım Listesi */}
+          {trips.length > 0 && (
+            <View style={styles.listContainer}>
+              <Text style={styles.listSectionTitle}>Kaydedilen Rotalarım ✨</Text>
+              {trips.map((item) => (
+                <View key={item.id} style={styles.tripCard}>
+                  <View style={styles.tripCardHeader}>
+                    <Text style={styles.tripCity}>📍 {item.city}</Text>
+                    <Text style={styles.tripDate}>{item.date}</Text>
+                  </View>
+                  {item.notes ? (
+                    <Text style={styles.tripNotes}>{item.notes}</Text>
+                  ) : null}
+                  <View style={styles.cardFlower}>
+                    <Text>🌸</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* Alt Dekorasyon */}
+          <View style={styles.footerDecor}>
+            <Text style={styles.footerDecorText}>✨ ☁️ 🌿 ☁️ ✨</Text>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -67,7 +109,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF5F8', // Yumuşak pastel pembe
+    backgroundColor: '#FFF5F8',
   },
   scrollContent: {
     padding: 24,
@@ -86,7 +128,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   decorText: {
-    fontSize: 32,
+    fontSize: 52,
   },
   decorTextSmall: {
     fontSize: 20,
@@ -99,13 +141,13 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 36,
     fontWeight: '700',
-    color: '#FF85A2', // Canlı pembe
+    color: '#FF85A2',
     letterSpacing: 1.2,
     textAlign: 'center',
   },
   headerSubtitle: {
     fontSize: 16,
-    color: '#BFA2B2', // Yumuşak gri-mor
+    color: '#BFA2B2',
     marginTop: 8,
     fontStyle: 'italic',
   },
@@ -118,6 +160,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 15,
     elevation: 10,
+    marginBottom: 40,
   },
   inputWrapper: {
     marginBottom: 20,
@@ -140,7 +183,7 @@ const styles = StyleSheet.create({
     color: '#4F4F4F',
   },
   textArea: {
-    height: 120,
+    height: 100,
     textAlignVertical: 'top',
   },
   button: {
@@ -160,8 +203,61 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
   },
+  listContainer: {
+    marginTop: 10,
+  },
+  listSectionTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#9D8189',
+    marginBottom: 16,
+    marginLeft: 8,
+  },
+  tripCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 25,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#FFF0F3',
+    shadowColor: '#FFC1CC',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 3,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  tripCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  tripCity: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FF85A2',
+  },
+  tripDate: {
+    fontSize: 12,
+    color: '#BFA2B2',
+  },
+  tripNotes: {
+    fontSize: 14,
+    color: '#7F6B73',
+    lineHeight: 20,
+  },
+  cardFlower: {
+    position: 'absolute',
+    bottom: -10,
+    right: -10,
+    opacity: 0.2,
+    transform: [{ scale: 1.5 }],
+  },
   footerDecor: {
     marginTop: 40,
+    marginBottom: 60,
     alignItems: 'center',
   },
   footerDecorText: {
