@@ -32,16 +32,26 @@ export default function App() {
     }
   };
 
-  const handleAddTrip = () => {
+  const handleAddTrip = async () => {
     if (city.trim() === '') {
       Alert.alert('Hata', 'Lütfen bir şehir ismi girin 🌸');
       return;
+    }
+
+    let quote = "";
+    try {
+      const response = await fetch('https://api.quotable.io/random?tags=wisdom|inspirational');
+      const data = await response.json();
+      quote = data.content;
+    } catch (e) {
+      quote = "Yolculuk, her adımda yeni bir keşiftir. ✨";
     }
 
     const newTrip = {
       id: Date.now().toString(),
       city: city,
       notes: notes,
+      quote: quote,
       date: new Date().toLocaleDateString('tr-TR'),
     };
 
@@ -138,6 +148,13 @@ export default function App() {
                     </TouchableOpacity>
                   </View>
                   <Text style={styles.tripDate}>{item.date}</Text>
+
+                  {item.quote ? (
+                    <View style={styles.quoteWrapper}>
+                      <Text style={styles.tripQuote}>"{item.quote}"</Text>
+                    </View>
+                  ) : null}
+
                   {item.notes ? (
                     <Text style={styles.tripNotes}>{item.notes}</Text>
                   ) : null}
@@ -306,6 +323,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#7F6B73',
     lineHeight: 20,
+    marginTop: 8,
+  },
+  quoteWrapper: {
+    backgroundColor: '#FFF0F3',
+    padding: 10,
+    borderRadius: 15,
+    marginVertical: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: '#FFB3C6',
+  },
+  tripQuote: {
+    fontSize: 13,
+    color: '#9D8189',
+    fontStyle: 'italic',
+    lineHeight: 18,
   },
   cardFlower: {
     position: 'absolute',

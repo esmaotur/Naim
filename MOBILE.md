@@ -40,12 +40,23 @@
 - **Kullanılan Araçlar:** `@react-native-async-storage/async-storage`, `useEffect`, `Alert` API.
 - **Notlar:** Uygulama artık "gerçek" bir uygulama gibi davranıyor; veriler kaybolmuyor. 55kg kaldırıldı!
 
+### İterasyon 4 — Motivasyonel Alıntılar API (Heavy Lift)
+- **Tarih:** 31 Mart 2026
+- **Kaldırılan Ağırlık:** 20 kg 🏋️‍♂️
+- **Eklenen Özellikler:** 
+    - `fetch` API ile `quotable.io` adresinden harici veri çekme.
+    - Her yeni rota kaydında rastgele bir seyahat/bilgelik sözü eklenmesi.
+    - Sözler için özel, soft ve italik tasarım (quoteWrapper).
+    - Çekilen sözlerin de telefon hafızasına kaydedilmesi.
+- **Kullanılan Araçlar:** Fetch API, Async/Await pattern.
+- **Notlar:** Uygulama artık dış dünya ile iletişim kuruyor. Toplam ağırlık 75kg!
+
 ---
 
 ## ⚖️ Toplam Ağırlık (Grade Score)
-**Toplam Kaldırılan:** 55 kg
+**Toplam Kaldırılan:** 75 kg
 
 ---
 
 ## 🧠 Refleksiyon
-Üçüncü adımda uygulamanın "veri güvenliğini" sağladık. AsyncStorage kurulumu ve yönetimi sayesinde proje çok daha profesyonel bir seviyeye geldi. Silme özelliği ise yönetilebilirliği artırdı. Bir sonraki hedefimiz Hava Durumu veya AI desteği ekleyerek 75-100 kg barajını zorlamak.
+Dördüncü adımda projenin "akıllılık" seviyesini artırdık. API kullanımı bir mobil uygulamanın en kritik yetkinliklerinden biridir. Tasarımda bu yeni alanı (alıntıları) ana notlardan ayırmak için soft bir kutucuk tasarımı kullandık. Bir sonraki hedef AI (Yapay Zeka) entegrasyonu ile 100 kg barajını geçmek!
