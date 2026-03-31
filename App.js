@@ -1,11 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput, SafeAreaView, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { StyleSheet, Text, View, TextInput, SafeAreaView, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert, Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function App() {
   const [city, setCity] = useState('');
   const [notes, setNotes] = useState('');
   const [trips, setTrips] = useState([]); // Rotaları tutan liste
+  const [aiModalVisible, setAiModalVisible] = useState(false);
+  const [currentAiTip, setCurrentAiTip] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
+
+  // AI Tavsiyeleri (Mock Database)
+  const aiTips = {
+    "İstanbul": "Boğaz'da gün batımını izle, Karaköy'de kahve iç ve mutlaka gizli geçitleri keşfet! ☕🌉",
+    "Paris": "Eyfel'in kalabalığından kaç, Montmartre'ın ara sokaklarında kaybol... 🎨🥐",
+    "Roma": "Trastevere bölgesinde akşam yemeği ye, Trevi çeşmesine gece git! 🍕⛲",
+    "Londra": "South Bank'te yürü, Camden Market'ta vintage ürünler bul! 🎡🎸",
+    "Tokyo": "Shibuya'da kalabalığa karış, Shinjuku'da neon ışıkları izle! 🍣🏮"
+  };
+
+  const getAiTip = (cityName) => {
+    setSelectedCity(cityName);
+    const tip = aiTips[cityName] || `${cityName} harika bir seçim! Orada yerel pazarları gezmeyi ve en ünlü yemeği tatmayı unutma! ✨🌸`;
+    setCurrentAiTip(tip);
+    setAiModalVisible(true);
+  };
 
   // Uygulama açıldığında verileri yükle
   useEffect(() => {
@@ -158,6 +177,11 @@ export default function App() {
                   {item.notes ? (
                     <Text style={styles.tripNotes}>{item.notes}</Text>
                   ) : null}
+
+                  <TouchableOpacity style={styles.aiButton} onPress={() => getAiTip(item.city)}>
+                    <Text style={styles.aiButtonText}>AI Tavsiyesi Al ✨🤖</Text>
+                  </TouchableOpacity>
+
                   <View style={styles.cardFlower}>
                     <Text>🌸</Text>
                   </View>
@@ -165,6 +189,28 @@ export default function App() {
               ))}
             </View>
           )}
+
+          {/* AI Modal */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={aiModalVisible}
+            onRequestClose={() => setAiModalVisible(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>🤖 AI Seyahat Notu</Text>
+                <Text style={styles.modalCity}>{selectedCity}</Text>
+                <Text style={styles.modalTip}>{currentAiTip}</Text>
+                <TouchableOpacity
+                  style={styles.closeBtn}
+                  onPress={() => setAiModalVisible(false)}
+                >
+                  <Text style={styles.closeBtnText}>Kapat 🌸</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
 
           {/* Alt Dekorasyon */}
           <View style={styles.footerDecor}>
@@ -338,6 +384,67 @@ const styles = StyleSheet.create({
     color: '#9D8189',
     fontStyle: 'italic',
     lineHeight: 18,
+  },
+  aiButton: {
+    backgroundColor: '#F3E5F5',
+    borderRadius: 12,
+    paddingVertical: 10,
+    alignItems: 'center',
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#E1BEE7',
+  },
+  aiButtonText: {
+    color: '#7B1FA2',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 30,
+    padding: 30,
+    width: '85%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#7B1FA2',
+    marginBottom: 10,
+  },
+  modalCity: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#FF85A2',
+    marginBottom: 15,
+  },
+  modalTip: {
+    fontSize: 16,
+    color: '#4F4F4F',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 25,
+  },
+  closeBtn: {
+    backgroundColor: '#FFB3C6',
+    paddingHorizontal: 30,
+    paddingVertical: 12,
+    borderRadius: 15,
+  },
+  closeBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
   },
   cardFlower: {
     position: 'absolute',

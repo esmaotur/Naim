@@ -42,21 +42,31 @@
 
 ### İterasyon 4 — Motivasyonel Alıntılar API (Heavy Lift)
 - **Tarih:** 31 Mart 2026
-- **Kaldırılan Ağırlık:** 20 kg 🏋️‍♂️
+- **Kaldırılan Ağıvalık:** 20 kg 🏋️‍♂️
 - **Eklenen Özellikler:** 
     - `fetch` API ile `quotable.io` adresinden harici veri çekme.
     - Her yeni rota kaydında rastgele bir seyahat/bilgelik sözü eklenmesi.
     - Sözler için özel, soft ve italik tasarım (quoteWrapper).
-    - Çekilen sözlerin de telefon hafızasına kaydedilmesi.
 - **Kullanılan Araçlar:** Fetch API, Async/Await pattern.
 - **Notlar:** Uygulama artık dış dünya ile iletişim kuruyor. Toplam ağırlık 75kg!
+
+### İterasyon 5 — AI Seyahat Danışmanı (Boss Level)
+- **Tarih:** 31 Mart 2026
+- **Kaldırılan Ağırlık:** 25 kg 🏋️‍♂️
+- **Eklenen Özellikler:** 
+    - Her şehir için özel seyahat ipuçları üreten AI Asistanı mantığı (Mock AI).
+    - Şık bir "glassmorphism" Modal tasarımı ile AI tavsiyelerinin sunumu.
+    - Her rota kartına özel "AI Tavsiyesi Al" butonu.
+    - Popüler şehirler için özel, diğerleri için dinamik tavsiye üretimi.
+- **Kullanılan Araçlar:** React Native Modal, State mapping, Logic design.
+- **Notlar:** Uygulamaya akıllı bir boyut kazandırıldı. 100kg barajı aşıldı! 🏆
 
 ---
 
 ## ⚖️ Toplam Ağırlık (Grade Score)
-**Toplam Kaldırılan:** 75 kg
+**Toplam Kaldırılan:** 100 kg
 
 ---
 
 ## 🧠 Refleksiyon
-Dördüncü adımda projenin "akıllılık" seviyesini artırdık. API kullanımı bir mobil uygulamanın en kritik yetkinliklerinden biridir. Tasarımda bu yeni alanı (alıntıları) ana notlardan ayırmak için soft bir kutucuk tasarımı kullandık. Bir sonraki hedef AI (Yapay Zeka) entegrasyonu ile 100 kg barajını geçmek!
+Beşinci adımda projemizin zirve noktalarından birine ulaştık. AI entegrasyonu (simüle edilmiş olsa bile) kullanıcıya katma değer sağlayan en önemli özellik. Tasarımı çiçekli ve sevimli tutarken, modal yapısıyla modern bir mobil uygulama deneyimi sunduk. Artık "Heavyweight" liginde dünya rekoruna (150kg+) doğru ilerliyoruz.
